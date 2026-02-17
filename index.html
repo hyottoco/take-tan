@@ -1,0 +1,2577 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <title>タケ単 1022</title>
+
+  <style>
+    :root{
+      --bd:#ddd; --bd-dark:#2a2f3a;
+      --bg:#fff; --fg:#111;
+      --muted:#666;
+      --card:#fff; --card-dark:#171a21;
+
+      --pill-pad-y:6px; --pill-pad-x:8px; --pill-radius:999px;
+      --btn-radius:12px;
+
+      /* 復習系 */
+      --review-bg:#f3f6fb; --review-bd:#cfd8e3; --review-fg:#334155;
+      --review-bg-hover:#e9eef7; --review-accent:#64748b;
+
+      /* wheel */
+      --wheel-item-h:44px;
+      --wheel-fade:rgba(255,255,255,0.9);
+      --wheel-fade-dark:rgba(15,17,21,0.85);
+    }
+
+    body{
+      font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
+      margin:0; padding:5px;
+      background:var(--bg); color:var(--fg);
+      transition:background .2s ease,color .2s ease;
+    }
+
+    .card{
+      max-width:820px;
+      margin:0 auto;
+      padding:18px;
+      border:1px solid var(--bd);
+      border-radius:14px;
+      background:var(--card);
+      position:relative;
+      transition:background .2s ease,border-color .2s ease;
+    }
+
+    /* PC/iPad：縦長見え */
+    @media (min-width:768px){
+      .card{ max-width:300px; }
+    }
+
+    .page-title{
+      font-size:16px;
+      font-weight:700;
+      margin:0 0 12px;
+      text-align:center;
+      letter-spacing:.03em;
+      user-select:none;
+    }
+
+    /* 行レイアウト */
+    .row{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+    }
+    .topbar-right{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    /* 共通UI（badge/pill/small） */
+    .badge,.pill,button.small{
+      font-size:16px;
+      line-height:1;
+      padding:var(--pill-pad-y) var(--pill-pad-x);
+      border-radius:var(--pill-radius);
+      border:1px solid var(--bd);
+      background:transparent;
+      color:inherit;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      user-select:none;
+      white-space:nowrap;
+      transition:background .2s ease,border-color .2s ease,color .2s ease;
+    }
+    .pill{ cursor:pointer; }
+    button.small{ cursor:pointer; }
+    button.small:active{ transform:translateY(1px); }
+
+    button{
+      font-size:16px;
+      padding:10px 14px;
+      border-radius:var(--btn-radius);
+      border:1px solid var(--bd);
+      background:#fff;
+      color:#111;
+      cursor:pointer;
+      transition:background .2s ease,border-color .2s ease,color .2s ease;
+    }
+    button:active{ transform:translateY(1px); }
+
+    .primary{ font-weight:500; }
+    .danger{ border-color:#f2c; }
+    .toggle{ border-color:#88c; }
+    .pill.togglePill{ border-color:#88c; }
+
+    /* iPhoneダブルタップ拡大など抑制 */
+    button, label, .pill{
+      -webkit-tap-highlight-color:transparent;
+      touch-action:manipulation;
+    }
+
+    /* 復習UI */
+    .reviewUI{
+      background:var(--review-bg);
+      border-color:var(--review-bd);
+      color:var(--review-fg);
+      border-radius:14px;
+    }
+    @media (hover:hover) and (pointer:fine){
+      .reviewUI:hover{ background:var(--review-bg-hover); }
+    }
+    @media (hover:none){
+      .reviewUI:hover{ background:var(--review-bg); }
+    }
+    .pressWhite:active{
+      background:#fff;
+      border-color:var(--review-bd);
+      color:var(--review-fg);
+    }
+
+    .pill input[type="checkbox"]{
+      width:18px; height:18px; margin:0;
+      accent-color:#88c;
+      transform:translateY(.5px);
+    }
+    .reviewUI input[type="checkbox"]{ accent-color:var(--review-accent); }
+    .pill .count{ opacity:.85; font-variant-numeric:tabular-nums; }
+
+    /* 1行目/2行目高さ調整 */
+    .topbar .badge,
+    .topbar-right button.small{
+      padding-top:12px; padding-bottom:12px;
+    }
+
+    /* 復習行 */
+    .reviewRow{
+      display:flex; align-items:center; gap:10px;
+      flex-wrap:nowrap;
+    }
+    .reviewRow-right{
+      margin-left:auto;
+      display:flex; align-items:center; gap:10px;
+    }
+    .reviewRow .pill,
+    .reviewRow button.small{
+      padding-top:12px; padding-bottom:12px;
+    }
+    @media (max-width:360px){
+      .reviewRow{ flex-wrap:wrap; }
+      .reviewRow-right{
+        width:100%;
+        justify-content:flex-end;
+        margin-left:0;
+      }
+    }
+
+    /* 範囲 + Auto + 現在No */
+    .rangeWrap{
+      width:100%;
+      display:grid;
+      grid-template-columns:1fr auto;
+      row-gap:6px;
+      column-gap:10px;
+    }
+    .rangeTop{ grid-column:1 / 3; display:contents; }
+    .rangeBadge{
+      grid-column:1;
+      width:fit-content;
+      justify-self:start;
+    }
+    #autoBtn{ grid-column:2; white-space:nowrap; }
+    .rangeNow{
+      grid-column:2;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding-left:2px;
+    }
+    @media (max-width:360px){
+      .rangeWrap{ grid-template-columns:1fr; }
+      #autoBtn, .rangeNow{ grid-column:1; }
+    }
+
+    .rangeInput{
+      width:3.5em;
+      padding:6px;
+      border:1px solid var(--bd);
+      border-radius:10px;
+      font-size:14px;
+      background:transparent;
+      color:inherit;
+      text-align:left;
+    }
+    .rangeInput::-webkit-outer-spin-button,
+    .rangeInput::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+    .rangeInput[type="number"]{ appearance:textfield; }
+
+    .word-no,.word-num-header{
+      font-size:14px;
+      font-weight:600;
+      color:var(--muted);
+      line-height:1;
+      user-select:none;
+    }
+
+    .displayArea{ min-height:155px; }
+    .word{ margin:18px 0 10px; line-height:1.1; word-break:break-word; }
+    .word-text{ font-size:30px; font-weight:400; }
+    .meaning{
+      font-size:20px;
+      margin:10px 0 0;
+      min-height:40px;
+      word-break:break-word;
+      overflow-wrap:anywhere;
+    }
+
+    .btns{
+      display:flex;
+      gap:10px;
+      margin-top:16px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    #nextBtn{ width:100%; }
+
+    /* 復習リストに追加 */
+    .missBox{
+      display:none;
+      margin-top:12px;
+      padding:6px;
+      border:1px solid var(--bd);
+      border-radius:12px;
+      align-items:center;
+      gap:10px;
+      background:rgba(0,0,0,0.02);
+
+      width:100%;
+      box-sizing:border-box;
+      justify-content:center;
+      cursor:pointer;
+    }
+    .missBox.show{ display:flex; }
+    .missBox input{ width:22px; height:22px; margin:0; cursor:pointer; }
+    .missBox .label{ font-size:14px; user-select:none; white-space:nowrap; }
+
+    /* 探す行 */
+    .searchRow{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:nowrap;
+    }
+    .searchRow-right{
+      margin-left:auto;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:nowrap;
+      min-width:0;
+    }
+    .searchRow > button,
+    .searchRow-right > button{ font-size:14px; }
+
+    /* 発音速度 */
+    .speedBox{
+      display:flex;
+      align-items:center;
+      gap:4px;
+      padding:8px;
+      border:1px solid var(--bd);
+      border-radius:999px;
+      background:transparent;
+      user-select:none;
+      width:fit-content;
+    }
+    .speedBox input[type="range"]{ width:48px; margin:0; }
+    .speedBox .val{
+      font-size:13px;
+      font-variant-numeric:tabular-nums;
+      white-space:nowrap;
+      opacity:.9;
+      min-width:2.0em;
+      text-align:right;
+    }
+
+    /* Auto時間 */
+    .autoTimeRow{
+      margin-top:8px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:nowrap;
+    }
+    .autoTimeBadge{
+      flex:0 0 auto;
+      width:fit-content;
+      display:flex;
+      align-items:center;
+      gap:6px;
+      flex-wrap:nowrap;
+      overflow:hidden;
+    }
+    .msInput{
+      width:2.5em;
+      padding:4px 8px;
+      border:1px solid var(--bd);
+      border-radius:10px;
+      font-size:14px;
+      background:transparent;
+      color:inherit;
+    }
+    .msInput::-webkit-outer-spin-button,
+    .msInput::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+    .msInput[type="number"]{ appearance:textfield; }
+    .miniLbl{ font-size:13px; opacity:.85; }
+    .unit{ font-size:12px; opacity:.75; }
+    button.small.miniBtn{
+      font-size:14px;
+      padding:6px 8px;
+      border-radius:999px;
+      line-height:1;
+      white-space:nowrap;
+    }
+
+    /* WakeLock badge */
+    .wakeBadge{
+      position:fixed;
+      top:calc(env(safe-area-inset-top) + 8px);
+      right:8px;
+      font-size:11px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid var(--bd);
+      background:rgba(255,255,255,0.75);
+      user-select:none;
+      display:none;
+      z-index:99999;
+      align-items:center;
+      gap:8px;
+    }
+    .wakeBadge.show{ display:inline-flex; }
+    .wakeDot{ width:7px; height:7px; border-radius:999px; background:#999; }
+    .wakeDot.on{ background:#22c55e; }
+    .wakeDot.off{ background:#ef4444; }
+
+    /* ダーク */
+    body.dark{ background:#0f1115; color:#e9e9ea; }
+    body.dark .card{ background:var(--card-dark); border-color:var(--bd-dark); }
+    body.dark .badge,
+    body.dark button.small,
+    body.dark .pill{
+      border-color:var(--bd-dark);
+      background:rgba(255,255,255,0.03);
+      color:#d6d6d8;
+    }
+    body.dark button{
+      background:#1f2430;
+      border-color:var(--bd-dark);
+      color:#e9e9ea;
+    }
+    body.dark .rangeInput,
+    body.dark .msInput,
+    body.dark .speedBox{ border-color:var(--bd-dark); }
+    body.dark .word-num-header{ color:#aaa; }
+    body.dark .reviewUI{
+      background:rgba(255,255,255,0.06);
+      border-color:var(--bd-dark);
+      color:#e5e7eb;
+    }
+    body.dark .pressWhite:active{
+      background:rgba(255,255,255,0.16);
+      border-color:var(--bd-dark);
+      color:#e5e7eb;
+    }
+    body.dark .missBox{
+      border-color:var(--bd-dark);
+      background:rgba(255,255,255,0.03);
+    }
+    body.dark .wakeBadge{
+      border-color:var(--bd-dark);
+      background:rgba(0,0,0,0.25);
+    }
+
+    /* ===== wheel modal ===== */
+    .modalOverlay{
+      position:fixed; inset:0;
+      background:rgba(0,0,0,0.35);
+      display:none;
+      align-items:flex-end;
+      justify-content:center;
+      padding:calc(env(safe-area-inset-top) + 10px) 14px calc(env(safe-area-inset-bottom) + 14px);
+      z-index:9999;
+    }
+    .modalOverlay.show{ display:flex; }
+
+    .modalSheet{
+      width:min(500px,100%);
+      border-radius:18px;
+      border:1px solid var(--bd);
+      background:#fff;
+      color:#111;
+      box-shadow:0 12px 40px rgba(0,0,0,.18);
+      overflow:hidden;
+      transform:translateY(8px);
+      animation:sheetIn .16s ease-out forwards;
+      max-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 20px);
+      overflow:auto;
+      -webkit-overflow-scrolling:touch;
+    }
+    @keyframes sheetIn{ to{ transform:translateY(0); } }
+    body.dark .modalSheet{
+      background:#171a21;
+      color:#e9e9ea;
+      border-color:var(--bd-dark);
+      box-shadow:0 12px 40px rgba(0,0,0,.35);
+    }
+
+    .modalHeader{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:6px 12px;
+      border-bottom:1px solid var(--bd);
+      gap:10px;
+    }
+    body.dark .modalHeader{ border-bottom-color:var(--bd-dark); }
+    .modalTitle{
+      font-size:14px;
+      font-weight:700;
+      letter-spacing:.02em;
+      opacity:.95;
+      user-select:none;
+    }
+    .mini{
+      font-size:14px;
+      padding:10px 12px;
+      border-radius:999px;
+      border:1px solid var(--bd);
+      background:transparent;
+      color:inherit;
+      cursor:pointer;
+    }
+    body.dark .mini{
+      border-color:var(--bd-dark);
+      background:rgba(255,255,255,0.03);
+    }
+
+    .wheelSearchRow{
+      display:flex;
+      gap:8px;
+      padding:6px;
+      border-bottom:1px solid var(--bd);
+    }
+    body.dark .wheelSearchRow{ border-bottom-color:var(--bd-dark); }
+
+    .wheelSearch{
+      flex:1;
+      border:1px solid var(--bd);
+      border-radius:12px;
+      padding:10px 12px;
+      font-size:14px;
+      background:transparent;
+      color:inherit;
+      outline:none;
+    }
+    body.dark .wheelSearch{ border-color:var(--bd-dark); }
+
+    .wheelArea{ position:relative; padding:12px 12px 2px; }
+    .wheelViewport{
+      position:relative;
+      height:calc(var(--wheel-item-h) * 7);
+      overflow-y:auto;
+      -webkit-overflow-scrolling:touch;
+      scroll-snap-type:y mandatory;
+      overscroll-behavior:contain;
+      border-radius:16px;
+      border:1px solid var(--bd);
+      background:rgba(0,0,0,0.02);
+      touch-action:pan-y;
+    }
+    body.dark .wheelViewport{
+      border-color:var(--bd-dark);
+      background:rgba(255,255,255,0.03);
+    }
+    .wheelFadeTop,.wheelFadeBottom{
+      pointer-events:none;
+      position:absolute;
+      left:12px; right:12px;
+      height:44px;
+      z-index:2;
+    }
+    .wheelFadeTop{ top:12px; background:linear-gradient(to bottom,var(--wheel-fade),rgba(255,255,255,0)); }
+    .wheelFadeBottom{ bottom:2px; background:linear-gradient(to top,var(--wheel-fade),rgba(255,255,255,0)); }
+    body.dark .wheelFadeTop{ background:linear-gradient(to bottom,var(--wheel-fade-dark),rgba(15,17,21,0)); }
+    body.dark .wheelFadeBottom{ background:linear-gradient(to top,var(--wheel-fade-dark),rgba(15,17,21,0)); }
+
+    .wheelList{ padding:calc(var(--wheel-item-h)*3) 0; margin:0; list-style:none; }
+    .wheelItem{
+      height:var(--wheel-item-h);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      scroll-snap-align:center;
+      user-select:none;
+      padding:0 14px;
+    }
+    .wheelItemInner{
+      width:100%;
+      max-width:92%;
+      text-align:left;
+      padding:8px 10px;
+      border-radius:14px;
+      border:1px solid transparent;
+      line-height:1.15;
+      word-break:break-word;
+      overflow-wrap:anywhere;
+      display:grid;
+      grid-template-columns:3.2em 1fr;
+      column-gap:10px;
+      align-items:center;
+    }
+    .wheelItemInner .num{
+      font-size:12px;
+      opacity:.70;
+      font-variant-numeric:tabular-nums;
+      user-select:none;
+    }
+    .wheelItemInner .main{ font-size:18px; font-weight:500; }
+    .wheelItemInner .ja{
+      display:block;
+      font-size:12px;
+      opacity:.70;
+      margin-top:2px;
+      line-height:1.2;
+    }
+    .wheelItem.isActive .wheelItemInner{
+      border-color:rgba(100,116,139,0.25);
+      background:rgba(100,116,139,0.06);
+    }
+
+    .wheelHint{
+      font-size:12px;
+      opacity:.75;
+      padding:0 12px 10px;
+      user-select:none;
+      min-height:1.2em;
+    }
+    .wheelFooter{
+      display:flex;
+      gap:10px;
+      padding:8px;
+      border-top:1px solid var(--bd);
+      justify-content:flex-end;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    body.dark .wheelFooter{ border-top-color:var(--bd-dark); }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <h1 id="pageTitle" class="page-title"></h1>
+
+    <div class="topbar">
+      <div class="badge" id="progress">0 / 0</div>
+      <div class="topbar-right">
+        <button id="resetBtn" class="small reviewUI" type="button">Reset</button>
+        <button class="small reviewUI pressWhite" id="clearWrongBtn" type="button">復習Reset</button>
+      </div>
+    </div>
+
+    <div class="row reviewRow">
+      <label class="pill togglePill reviewUI" for="wrongOnlyToggle">
+        <input type="checkbox" id="wrongOnlyToggle" />
+        復習 <span class="count" id="wrongCount">(0)</span>
+      </label>
+
+      <div class="reviewRow-right">
+        <button class="small toggle" id="audioToggle" type="button">🔊</button>
+        <button class="small toggle" id="themeToggle" type="button">🌙</button>
+        <button class="small toggle" id="orderToggle" type="button">🔀</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="rangeWrap">
+        <div class="rangeTop">
+          <label class="badge rangeBadge">
+            No
+            <input id="rangeFrom" class="rangeInput" type="number" min="1">
+            〜
+            <input id="rangeTo" class="rangeInput" type="number" min="1">
+          </label>
+
+          <button class="small toggle" id="autoBtn" type="button">▶︎ Auto</button>
+        </div>
+
+        <div class="rangeNow">
+          <span class="word-no">No</span>
+          <span id="wordNumHeader" class="word-num-header"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="displayArea">
+      <div class="word">
+        <span class="word-text" id="wordText">（reading…）</span>
+      </div>
+      <div class="meaning" id="meaning"></div>
+    </div>
+
+    <div class="btns">
+      <button class="primary" id="nextBtn" type="button">はじめる</button>
+    </div>
+
+    <label class="missBox reviewUI" id="missBox">
+      <input type="checkbox" id="missToggle">
+      <span class="label">復習リストに追加</span>
+    </label>
+
+    <div class="btns searchRow">
+      <button id="wheelOpenBtn" type="button">🎡 探す</button>
+
+      <div class="searchRow-right">
+        <div class="speedBox" title="発音速度を調整します">
+          <input id="rateRange" type="range" min="0.6" max="1.2" step="0.1" value="1.0" />
+          <span id="rateLabel" class="val">1.0x</span>
+        </div>
+
+        <button id="speakBtn" type="button">🔊 発音</button>
+      </div>
+    </div>
+
+    <div class="row autoTimeRow">
+      <div class="badge autoTimeBadge">
+        ▶︎
+        <span class="miniLbl">英</span>
+        <input id="autoEnMs" class="msInput" type="number" min="200" max="9999" step="100">
+        <span class="unit">ms</span>
+        <span class="unit">:</span>
+        <span class="miniLbl">日</span>
+        <input id="autoJaMs" class="msInput" type="number" min="200" max="9999" step="100">
+        <span class="unit">ms</span>
+      </div>
+      <button class="small miniBtn reviewUI pressWhite" id="autoTimeResetBtn" type="button">初期値</button>
+    </div>
+
+    <div class="wakeBadge" id="wakeBadge" title="Auto中はスリープしにくくします（対応ブラウザのみ）">
+      <span class="wakeDot off" id="wakeDot"></span>
+      <span id="wakeText">Wake: OFF</span>
+    </div>
+  </div>
+
+  <!-- 🎡 モーダル -->
+  <div class="modalOverlay" id="wheelOverlay" aria-hidden="true">
+    <div class="modalSheet" role="dialog" aria-modal="true" aria-labelledby="wheelTitle">
+      <div class="modalHeader">
+        <div class="modalTitle" id="wheelTitle">🎡 単語検索（英or日）</div>
+        <button class="mini" id="wheelCloseBtn" type="button">閉じる</button>
+      </div>
+
+      <div class="wheelSearchRow">
+        <input class="wheelSearch" id="wheelSearchInput" type="search" placeholder="キーワード検索" autocomplete="off" />
+        <button class="mini" id="wheelClearSearchBtn" type="button">クリア</button>
+      </div>
+
+      <div class="wheelArea">
+        <div class="wheelFadeTop"></div>
+        <div class="wheelFadeBottom"></div>
+
+        <div class="wheelViewport" id="wheelViewport">
+          <ul class="wheelList" id="wheelList"></ul>
+        </div>
+      </div>
+
+      <div class="wheelHint" id="wheelHint"></div>
+
+      <div class="wheelFooter">
+        <button class="mini" id="wheelJumpBtn" type="button">この単語へ移動</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* =========================
+   VOCAB（あなたのデータに置換）
+========================= */
+const VOCAB = [
+  { en: "emerge", ja: "出現する" },
+  { en: "comply", ja: "従う" },
+  { en: "trespass", ja: "不法侵入する" },
+  { en: "exclaim", ja: "叫ぶ" },
+  { en: "crouch", ja: "しゃがむ" },
+  { en: "correspond", ja: "一致する／文通する" },
+  { en: "bounce", ja: "跳ねる" },
+  { en: "underrate", ja: "過小評価する" },
+  { en: "stack", ja: "積み重ねる" },
+  { en: "enforce", ja: "施行する" },
+  { en: "reconcile", ja: "一致させる／和解させる" },
+  { en: "swipe", ja: "さっと払う／盗む" },
+  { en: "evade", ja: "回避する" },
+  { en: "scorn", ja: "軽蔑する" },
+  { en: "rouse", ja: "呼び起こす" },
+  { en: "pluck", ja: "引き抜く" },
+  { en: "liquefy", ja: "液化する" },
+  { en: "lounge", ja: "くつろぐ" },
+  { en: "hover", ja: "浮かぶ／漂う" },
+  { en: "recollect", ja: "思い出す" },
+  { en: "enlarge", ja: "拡大する" },
+  { en: "remodel", ja: "改造する" },
+  { en: "rehearse", ja: "予行演習する" },
+  { en: "replicate", ja: "複製する" },
+  { en: "hatch", ja: "（計画などを）考え出す／孵化する" },
+  { en: "deploy", ja: "配備する" },
+  { en: "arouse", ja: "引き起こす" },
+  { en: "harness", ja: "利用する" },
+  { en: "violate", ja: "侵害する" },
+  { en: "unleash", ja: "解き放つ" },
+  { en: "reel", ja: "よろめく" },
+  { en: "portray", ja: "描写する" },
+  { en: "dislocate", ja: "脱臼させる" },
+  { en: "haunt", ja: "つきまとう" },
+  { en: "rebel", ja: "反抗する" },
+  { en: "compensate", ja: "補償する" },
+  { en: "displace", ja: "追いやる" },
+  { en: "formulate", ja: "公式化する" },
+  { en: "abound", ja: "たくさんある" },
+  { en: "swerve", ja: "急に方向を変える" },
+  { en: "lure", ja: "誘い込む" },
+  { en: "escort", ja: "護衛する" },
+  { en: "rotate", ja: "回転する" },
+  { en: "drip", ja: "滴り落ちる" },
+  { en: "throw a party", ja: "パーティーを開く" },
+  { en: "acquit", ja: "無罪とする" },
+  { en: "foresee", ja: "予見する" },
+  { en: "duplicate", ja: "複製する" },
+  { en: "unbend", ja: "曲げ伸ばす" },
+  { en: "shatter", ja: "粉砕する" },
+  { en: "conserve", ja: "保存する" },
+  { en: "unveil", ja: "明らかにする" },
+  { en: "proclaim", ja: "宣言する" },
+  { en: "navigate", ja: "進路を決める" },
+  { en: "agitate", ja: "動揺させる" },
+  { en: "initiate", ja: "始める" },
+  { en: "barricade", ja: "封鎖する" },
+  { en: "calculate", ja: "計算する" },
+  { en: "shred", ja: "細断する" },
+  { en: "alienate", ja: "疎外する" },
+  { en: "dilute", ja: "薄める" },
+  { en: "integrate", ja: "統合する" },
+  { en: "choke", ja: "窒息させる" },
+  { en: "season", ja: "味付けする" },
+  { en: "caress", ja: "愛撫する" },
+  { en: "task", ja: "任務を課す" },
+  { en: "penalize", ja: "罰する" },
+  { en: "underfeed", ja: "栄養不足にする" },
+  { en: "deposit", ja: "預ける" },
+  { en: "detective", ja: "探偵" },
+  { en: "fetch", ja: "取ってくる" },
+  { en: "eject", ja: "追い出す" },
+  { en: "inflict", ja: "与える（苦痛など）" },
+  { en: "inhibit", ja: "抑制する" },
+  { en: "centralize", ja: "集中させる" },
+  { en: "preclude", ja: "妨げる" },
+  { en: "strangle", ja: "絞め殺す" },
+  { en: "vacate", ja: "立ち退く" },
+  { en: "dispel", ja: "追い払う" },
+  { en: "enrage", ja: "激怒させる" },
+  { en: "encase", ja: "包む" },
+  { en: "certify", ja: "証明する" },
+  { en: "inherit", ja: "相続する" },
+  { en: "confer", ja: "授与する" },
+  { en: "paralyze", ja: "麻痺させる" },
+  { en: "dismay", ja: "狼狽させる" },
+  { en: "manipulate", ja: "操作する" },
+  { en: "testify", ja: "証言する" },
+  { en: "propel", ja: "推進する" },
+  { en: "embarrass", ja: "困惑させる" },
+  { en: "ventilate", ja: "換気する" },
+  { en: "conform", ja: "従う" },
+  { en: "incorporate", ja: "組み入れる" },
+  { en: "disgust", ja: "嫌悪させる" },
+  { en: "administer", ja: "管理する" },
+  { en: "outline", ja: "概説する" },
+  { en: "feature", ja: "特集する" },
+  { en: "uphold", ja: "支持する" },
+  { en: "deflect", ja: "そらす" },
+  { en: "disrupt", ja: "混乱させる" },
+  { en: "refrain", ja: "控える" },
+  { en: "sweep", ja: "掃く" },
+  { en: "brag", ja: "自慢する" },
+  { en: "plunge", ja: "突っ込む" },
+  { en: "originate", ja: "発生する" },
+  { en: "ignite", ja: "点火する" },
+  { en: "dispense", ja: "分配する" },
+  { en: "repeal", ja: "廃止する" },
+  { en: "curb", ja: "抑制する" },
+  { en: "outlaw", ja: "非合法化する" },
+  { en: "outsmart", ja: "出し抜く" },
+  { en: "overrate", ja: "過大評価する" },
+  { en: "purify", ja: "浄化する" },
+  { en: "inhibit", ja: "抑制する" },
+  { en: "disarm", ja: "武装解除する" },
+  { en: "blur", ja: "ぼかす" },
+  { en: "topple", ja: "倒す" },
+  { en: "encode", ja: "符号化する" },
+  { en: "distrust", ja: "信用しない" },
+  { en: "enchant", ja: "魅了する" },
+  { en: "exile", ja: "追放する" },
+  { en: "surrender", ja: "降伏する" },
+  { en: "execute", ja: "実行する" },
+  { en: "delegate", ja: "委任する" },
+  { en: "simmer", ja: "煮える" },
+  { en: "snap", ja: "折れる" },
+  { en: "intersect", ja: "交差する" },
+  { en: "obstruct", ja: "妨害する" },
+  { en: "diverge", ja: "分岐する" },
+  { en: "rejoice", ja: "喜ぶ" },
+  { en: "stagger", ja: "よろめく" },
+  { en: "exploit", ja: "利用する" },
+  { en: "prosecute", ja: "起訴する" },
+  { en: "redeem", ja: "償う" },
+  { en: "restrain", ja: "抑える" },
+  { en: "sway", ja: "揺らす" },
+  { en: "exert", ja: "行使する" },
+  { en: "demote", ja: "降格させる" },
+  { en: "repel", ja: "撃退する" },
+  { en: "berate", ja: "叱責する" },
+  { en: "thrust", ja: "押し出す" },
+  { en: "entwine", ja: "絡ませる" },
+  { en: "concede", ja: "認める" },
+  { en: "disregard", ja: "無視する" },
+  { en: "cradle", ja: "抱く" },
+  { en: "steer", ja: "操縦する" },
+  { en: "subscribe", ja: "購読する" },
+  { en: "interpret", ja: "解釈する" },
+  { en: "strive", ja: "努力する" },
+  { en: "surrender", ja: "降伏する" },
+  { en: "anguish", ja: "苦悩" },
+  { en: "dismiss", ja: "却下する" },
+  { en: "subsidize", ja: "補助金を出す" },
+  { en: "contest", ja: "異議を唱える" },
+  { en: "pardon", ja: "許す" },
+  { en: "dread", ja: "恐れる" },
+  { en: "contemplate", ja: "熟考する" },
+  { en: "maze", ja: "迷わせる" },
+  { en: "incriminate", ja: "罪に陥れる" },
+  { en: "dodge", ja: "かわす" },
+  { en: "harbor", ja: "抱く" },
+  { en: "dock", ja: "埠頭" },
+  { en: "bewilder", ja: "当惑させる" },
+  { en: "inflate", ja: "膨らませる" },
+  { en: "disperse", ja: "分散させる" },
+  { en: "groan", ja: "うめく" },
+  { en: "groom", ja: "手入れする" },
+  { en: "scrape", ja: "こする" },
+  { en: "entrust", ja: "任せる" },
+  { en: "downgrade", ja: "格下げする" },
+  { en: "resolve", ja: "解決する" },
+  { en: "verify", ja: "確認する" },
+  { en: "perspire", ja: "汗をかく" },
+  { en: "recall", ja: "思い出す" },
+  { en: "expend", ja: "費やす" },
+  { en: "suppress", ja: "抑える" },
+  { en: "waver", ja: "揺れ動く" },
+  { en: "lurk", ja: "潜む" },
+  { en: "tumble", ja: "転がる" },
+  { en: "grumble", ja: "不平を言う" },
+  { en: "scramble", ja: "よじ登る" },
+  { en: "hail", ja: "称賛する" },
+  { en: "affiliate", ja: "提携する" },
+  { en: "converge", ja: "集中する" },
+  { en: "withdraw", ja: "引き下がる" },
+  { en: "erupt", ja: "噴出する" },
+  { en: "admonish", ja: "戒める" },
+  { en: "multiply", ja: "増やす" },
+  { en: "signify", ja: "意味する" },
+  { en: "hinder", ja: "妨げる" },
+  { en: "restate", ja: "言い直す" },
+  { en: "inhale", ja: "吸い込む" },
+  { en: "hibernate", ja: "冬眠する" },
+  { en: "thrive", ja: "繁栄する" },
+  { en: "perch", ja: "止まる" },
+  { en: "stumble", ja: "つまずく" },
+  { en: "outweigh", ja: "上回る" },
+  { en: "contend", ja: "主張する" },
+  { en: "straddle", ja: "またがる" },
+  { en: "diminish", ja: "減少する" },
+  { en: "vault", ja: "跳躍する" },
+  { en: "dispose", ja: "処分する" },
+  { en: "tremble", ja: "震える" },
+  { en: "lobby", ja: "働きかける" },
+  { en: "sprint", ja: "全力疾走する" },
+  { en: "crumble", ja: "崩れる" },
+  { en: "disconnect", ja: "切断する" },
+  { en: "compress", ja: "圧縮する" },
+  { en: "summon", ja: "召喚する" },
+  { en: "reassign", ja: "再配置する" },
+  { en: "condense", ja: "凝縮する" },
+  { en: "appoint", ja: "任命する" },
+  { en: "bypass", ja: "迂回する" },
+  { en: "trim", ja: "刈り込む" },
+  { en: "subtract", ja: "差し引く" },
+  { en: "magnify", ja: "拡大する" },
+  { en: "chill", ja: "冷やす" },
+  { en: "disapprove", ja: "不賛成する" },
+  { en: "outrage", ja: "激怒させる" },
+  { en: "ensue", ja: "続いて起こる" },
+  { en: "mumble", ja: "つぶやく" },
+  { en: "abstain", ja: "控える" },
+  { en: "detour", ja: "迂回路" },
+  { en: "condensation", ja: "凝縮" },
+  { en: "abstain from", ja: "〜を控える" },
+  { en: "pinpoint", ja: "特定する" },
+  { en: "taint", ja: "汚す" },
+  { en: "bind-bound-bound", ja: "縛る" },
+  { en: "modulate", ja: "調整する" },
+  { en: "discredit", ja: "信用を失わせる" },
+  { en: "dismantle", ja: "解体する" },
+  { en: "lament", ja: "嘆く" },
+  { en: "mystify", ja: "困惑させる" },
+  { en: "retrace", ja: "たどる" },
+  { en: "plot", ja: "計画する" },
+  { en: "loathe", ja: "ひどく嫌う" },
+  { en: "liken", ja: "たとえる" },
+  { en: "authorize", ja: "許可する" },
+  { en: "sharpen", ja: "研ぐ" },
+  { en: "devise", ja: "考案する" },
+  { en: "divert", ja: "そらす" },
+  { en: "accuse", ja: "非難する" },
+  { en: "renounce", ja: "放棄する" },
+  { en: "sprout", ja: "芽を出す" },
+  { en: "allege", ja: "主張する" },
+  { en: "misplace", ja: "置き忘れる" },
+  { en: "endow", ja: "授ける" },
+  { en: "rival", ja: "競争する" },
+  { en: "pursue", ja: "追求する" },
+  { en: "exterminate", ja: "根絶する" },
+  { en: "fulfill", ja: "果たす" },
+  { en: "recede", ja: "後退する" },
+  { en: "collaborate", ja: "協力する" },
+  { en: "alleviate", ja: "和らげる" },
+  { en: "ascend", ja: "上昇する" },
+  { en: "lease", ja: "賃貸する" },
+  { en: "facilitate", ja: "促進する" },
+  { en: "browse", ja: "閲覧する" },
+  { en: "droop", ja: "垂れ下がる" },
+  { en: "glide", ja: "滑走する" },
+  { en: "detonate", ja: "爆発させる" },
+  { en: "emulate", ja: "見習う" },
+  { en: "fasten", ja: "固定する" },
+  { en: "amplify", ja: "増幅する" },
+  { en: "reopen", ja: "再開する" },
+  { en: "coincide", ja: "一致する" },
+  { en: "consecrate", ja: "奉献する" },
+  { en: "uproot", ja: "根こそぎにする" },
+  { en: "idolize", ja: "偶像視する" },
+  { en: "distribute", ja: "配布する" },
+  { en: "symbolize", ja: "象徴する" },
+  { en: "expel", ja: "追放する" },
+  { en: "wreak", ja: "引き起こす" },
+  { en: "knead", ja: "こねる" },
+  { en: "affirm", ja: "断言する" },
+  { en: "wander", ja: "さまよう" },
+  { en: "publicize", ja: "公表する" },
+  { en: "envision", ja: "思い描く" },
+  { en: "vary", ja: "変化する" },
+  { en: "collide", ja: "衝突する" },
+  { en: "penetrate", ja: "貫く" },
+  { en: "poke", ja: "突く" },
+  { en: "forsake", ja: "放棄する" },
+  { en: "allocate", ja: "割り当てる" },
+  { en: "thread", ja: "糸を通す" },
+  { en: "commence", ja: "開始する" },
+  { en: "constitute", ja: "構成する" },
+  { en: "constrain", ja: "制約する" },
+  { en: "suspend", ja: "停止する" },
+  { en: "insure", ja: "保険をかける" },
+  { en: "revise", ja: "修正する" },
+  { en: "harass", ja: "嫌がらせする" },
+  { en: "yearn", ja: "切望する" },
+  { en: "bundle", ja: "束ねる" },
+  { en: "depict", ja: "描写する" },
+  { en: "detach", ja: "切り離す" },
+  { en: "desert", ja: "見捨てる" },
+  { en: "insulate", ja: "断熱する" },
+  { en: "wield", ja: "行使する" },
+  { en: "sprain", ja: "捻挫する" },
+  { en: "vandalize", ja: "破壊する" },
+  { en: "submerge", ja: "水没させる" },
+  { en: "induce", ja: "誘発する" },
+  { en: "pinch", ja: "つねる" },
+  { en: "overpower", ja: "圧倒する" },
+  { en: "surmount", ja: "克服する" },
+  { en: "polarize", ja: "二極化させる" },
+  { en: "crave", ja: "切望する" },
+  { en: "disgrace", ja: "恥をかかせる" },
+  { en: "comprise", ja: "構成する" },
+  { en: "synthesize", ja: "合成する" },
+  { en: "cushion", ja: "和らげる" },
+  { en: "plague", ja: "悩ます" },
+  { en: "garble", ja: "めちゃくちゃにする" },
+  { en: "intoxicate", ja: "酔わせる" },
+  { en: "restructure", ja: "再構築する" },
+  { en: "fumigate", ja: "燻蒸する" },
+  { en: "energize", ja: "活性化する" },
+  { en: "foil", ja: "阻止する" },
+  { en: "outpace", ja: "追い越す" },
+  { en: "socialize", ja: "社交的にする" },
+  { en: "implode", ja: "崩壊する" },
+  { en: "salute", ja: "敬礼する" },
+  { en: "oppress", ja: "抑圧する" },
+  { en: "complement", ja: "補完する" },
+  { en: "swap", ja: "交換する" },
+  { en: "horrify", ja: "恐怖させる" },
+  { en: "renovate", ja: "改装する" },
+  { en: "devalue", ja: "価値を下げる" },
+  { en: "evacuate", ja: "避難させる" },
+  { en: "attain", ja: "達成する" },
+  { en: "degrade", ja: "劣化させる" },
+  { en: "defy", ja: "逆らう" },
+  { en: "smuggle", ja: "密輸する" },
+  { en: "upgrade", ja: "向上させる" },
+  { en: "sprinkle", ja: "振りかける" },
+  { en: "downsize", ja: "縮小する" },
+  { en: "deem", ja: "みなす" },
+  { en: "tread", ja: "踏む" },
+  { en: "flatter", ja: "お世辞を言う" },
+  { en: "profess", ja: "公言する" },
+  { en: "empower", ja: "権限を与える" },
+  { en: "solitude", ja: "孤独" },
+  { en: "constraint", ja: "制約" },
+  { en: "deduction", ja: "推論／控除" },
+  { en: "preliminary", ja: "予備の" },
+  { en: "trait", ja: "特性" },
+  { en: "additive", ja: "添加物" },
+  { en: "hibernation", ja: "冬眠" },
+  { en: "moderator", ja: "司会者" },
+  { en: "predecessor", ja: "前任者" },
+  { en: "gulf", ja: "湾／大きな隔たり" },
+  { en: "sob", ja: "すすり泣き" },
+  { en: "vice", ja: "悪徳" },
+  { en: "evolution", ja: "進化" },
+  { en: "commission", ja: "委員会／手数料" },
+  { en: "resurgence", ja: "再流行" },
+  { en: "antiquity", ja: "古代" },
+  { en: "compound", ja: "化合物" },
+  { en: "numeral", ja: "数字" },
+  { en: "morale", ja: "士気" },
+  { en: "stunt", ja: "離れ業／妨げる行為" },
+  { en: "elaboration", ja: "詳細化" },
+  { en: "hollow", ja: "空洞" },
+  { en: "recession", ja: "不況／後退" },
+  { en: "evasion", ja: "回避" },
+  { en: "revision", ja: "改訂" },
+  { en: "precision", ja: "正確さ" },
+  { en: "perimeter", ja: "周囲" },
+  { en: "posture", ja: "姿勢" },
+  { en: "excerpt", ja: "抜粋" },
+  { en: "scope", ja: "範囲" },
+  { en: "feast", ja: "宴" },
+  { en: "notion", ja: "考え" },
+  { en: "inception", ja: "始まり" },
+  { en: "flare", ja: "閃光／突然の発生" },
+  { en: "fatality", ja: "死亡者" },
+  { en: "constellation", ja: "星座" },
+  { en: "contraction", ja: "収縮" },
+  { en: "configuration", ja: "構成" },
+  { en: "successor", ja: "後継者" },
+  { en: "minor", ja: "未成年者／少数派" },
+  { en: "defendant", ja: "被告" },
+  { en: "attendant", ja: "付き添い" },
+  { en: "artistry", ja: "芸術性" },
+  { en: "enrollment", ja: "入学" },
+  { en: "efficacy", ja: "有効性" },
+  { en: "originator", ja: "創始者" },
+  { en: "intruder", ja: "侵入者" },
+  { en: "objection", ja: "反対" },
+  { en: "remedy", ja: "治療法" },
+  { en: "blockade", ja: "封鎖" },
+  { en: "seal", ja: "封印／アザラシ" },
+  { en: "rations", ja: "配給量" },
+  { en: "majesty", ja: "威厳" },
+  { en: "literacy", ja: "読み書き能力" },
+  { en: "assessment", ja: "評価" },
+  { en: "allegation", ja: "申し立て" },
+  { en: "ammunition", ja: "弾薬" },
+  { en: "elevation", ja: "上昇／標高" },
+  { en: "transcription", ja: "書き起こし" },
+  { en: "succession", ja: "連続" },
+  { en: "potion", ja: "薬" },
+  { en: "coalition", ja: "連合" },
+  { en: "strain", ja: "緊張" },
+  { en: "deed", ja: "行為／証書" },
+  { en: "sprain", ja: "捻挫" },
+  { en: "pharmacy", ja: "薬局" },
+  { en: "procession", ja: "行列" },
+  { en: "preservative", ja: "保存料" },
+  { en: "thorn", ja: "とげ" },
+  { en: "commodity", ja: "商品" },
+  { en: "downfall", ja: "没落" },
+  { en: "transmission", ja: "伝達" },
+  { en: "delusion", ja: "妄想" },
+  { en: "apprentice", ja: "見習い" },
+  { en: "inmate", ja: "収容者" },
+  { en: "informant", ja: "情報提供者" },
+  { en: "advocate", ja: "支持者" },
+  { en: "incidence", ja: "発生率" },
+  { en: "banner", ja: "旗" },
+  { en: "estate", ja: "財産" },
+  { en: "institute", ja: "機関" },
+  { en: "dominance", ja: "支配" },
+  { en: "pillar", ja: "柱" },
+  { en: "shaft", ja: "軸" },
+  { en: "heap", ja: "山" },
+  { en: "slant", ja: "傾き" },
+  { en: "vein", ja: "静脈" },
+  { en: "instruction", ja: "指示" },
+  { en: "inscription", ja: "碑文" },
+  { en: "extension", ja: "拡張" },
+  { en: "tenant", ja: "借家人" },
+  { en: "auditor", ja: "監査人" },
+  { en: "decency", ja: "礼儀" },
+  { en: "intimacy", ja: "親密さ" },
+  { en: "redundancy", ja: "余剰" },
+  { en: "contemplation", ja: "熟考" },
+  { en: "consent", ja: "同意" },
+  { en: "corridor", ja: "廊下" },
+  { en: "custody", ja: "保護／拘留" },
+  { en: "influx", ja: "流入" },
+  { en: "alignment", ja: "整列" },
+  { en: "piracy", ja: "海賊行為" },
+  { en: "occupier", ja: "占有者" },
+  { en: "outcast", ja: "追放者" },
+  { en: "domestication", ja: "家畜化" },
+  { en: "gratitude", ja: "感謝" },
+  { en: "commencement", ja: "開始／卒業式" },
+  { en: "surveillance", ja: "監視" },
+  { en: "predator", ja: "捕食者" },
+  { en: "ranger", ja: "監視員" },
+  { en: "proponent", ja: "支持者" },
+  { en: "tedium", ja: "退屈" },
+  { en: "recess", ja: "休憩" },
+  { en: "freight", ja: "貨物" },
+  { en: "hedge", ja: "生け垣" },
+  { en: "diagram", ja: "図表" },
+  { en: "reflex", ja: "反射" },
+  { en: "token", ja: "象徴" },
+  { en: "splinter", ja: "破片" },
+  { en: "objective", ja: "目的" },
+  { en: "negligence", ja: "怠慢" },
+  { en: "reservoir", ja: "貯水池" },
+  { en: "paddle", ja: "オール" },
+  { en: "carrier", ja: "運搬人" },
+  { en: "rite", ja: "儀式" },
+  { en: "foe", ja: "敵" },
+  { en: "ballot", ja: "投票" },
+  { en: "detergent", ja: "洗剤" },
+  { en: "diploma", ja: "卒業証書" },
+  { en: "drawback", ja: "欠点" },
+  { en: "janitor", ja: "用務員" },
+  { en: "transient", ja: "一時的な人" },
+  { en: "contender", ja: "競争者" },
+  { en: "dedication", ja: "献身" },
+  { en: "citation", ja: "引用" },
+  { en: "renovation", ja: "改修" },
+  { en: "insight", ja: "洞察" },
+  { en: "sanction", ja: "制裁" },
+  { en: "detachment", ja: "分離" },
+  { en: "urgency", ja: "緊急性" },
+  { en: "deficiency", ja: "不足" },
+  { en: "proficiency", ja: "熟達" },
+  { en: "potency", ja: "効力" },
+  { en: "partition", ja: "仕切り" },
+  { en: "vessel", ja: "容器／船" },
+  { en: "fragment", ja: "断片" },
+  { en: "split", ja: "分裂" },
+  { en: "porch", ja: "玄関" },
+  { en: "memento", ja: "記念品" },
+  { en: "criteria", ja: "基準" },
+  { en: "intuition", ja: "直感" },
+  { en: "cessation", ja: "停止" },
+  { en: "fruition", ja: "達成" },
+  { en: "evacuation", ja: "避難" },
+  { en: "resignation", ja: "辞任" },
+  { en: "activation", ja: "活性化" },
+  { en: "outburst", ja: "爆発" },
+  { en: "abundance", ja: "豊富" },
+  { en: "combat", ja: "戦闘" },
+  { en: "indent", ja: "切り込み" },
+  { en: "outpost", ja: "前哨基地" },
+  { en: "ejection", ja: "排出" },
+  { en: "obligation", ja: "義務" },
+  { en: "outlook", ja: "見通し" },
+  { en: "exemption", ja: "免除" },
+  { en: "envoy", ja: "使節" },
+  { en: "avail", ja: "利用" },
+  { en: "referral", ja: "紹介" },
+  { en: "acquisition", ja: "取得" },
+  { en: "excavation", ja: "発掘" },
+  { en: "conservation", ja: "保護" },
+  { en: "traitor", ja: "裏切り者" },
+  { en: "broker", ja: "仲介人" },
+  { en: "patron", ja: "後援者" },
+  { en: "missionary", ja: "宣教師" },
+  { en: "superstition", ja: "迷信" },
+  { en: "detection", ja: "探知" },
+  { en: "provocation", ja: "挑発" },
+  { en: "seclusion", ja: "隔離" },
+  { en: "assembly", ja: "集会" },
+  { en: "detention", ja: "拘留" },
+  { en: "organism", ja: "生物" },
+  { en: "hygiene", ja: "衛生" },
+  { en: "transaction", ja: "取引" },
+  { en: "conception", ja: "概念" },
+  { en: "deception", ja: "欺瞞" },
+  { en: "caricature", ja: "風刺画" },
+  { en: "relic", ja: "遺物" },
+  { en: "depot", ja: "倉庫" },
+  { en: "knack", ja: "才能" },
+  { en: "buckle", ja: "バックル" },
+  { en: "draft", ja: "下書き" },
+  { en: "cramp", ja: "けいれん" },
+  { en: "phobia", ja: "恐怖症" },
+  { en: "breakout", ja: "脱出" },
+  { en: "conspiracy", ja: "陰謀" },
+  { en: "solidarity", ja: "連帯" },
+  { en: "confirmation", ja: "確認" },
+  { en: "disruption", ja: "混乱" },
+  { en: "conviction", ja: "信念" },
+  { en: "botany", ja: "植物学" },
+  { en: "sarcasm", ja: "皮肉" },
+  { en: "conceit", ja: "うぬぼれ" },
+  { en: "suction", ja: "吸引" },
+  { en: "plea", ja: "嘆願" },
+  { en: "scoop", ja: "ひとすくい" },
+  { en: "outskirts", ja: "郊外" },
+  { en: "installment", ja: "分割払い" },
+  { en: "audacity", ja: "大胆さ" },
+  { en: "immortality", ja: "不死" },
+  { en: "abnormality", ja: "異常" },
+  { en: "oversight", ja: "見落とし" },
+  { en: "complication", ja: "複雑化" },
+  { en: "termination", ja: "終了" },
+  { en: "projection", ja: "予測" },
+  { en: "ignition", ja: "点火" },
+  { en: "fraction", ja: "一部" },
+  { en: "admiration", ja: "賞賛" },
+  { en: "standstill", ja: "停止" },
+  { en: "shortfall", ja: "不足" },
+  { en: "breakdown", ja: "崩壊" },
+  { en: "burden", ja: "負担" },
+  { en: "censorship", ja: "検閲" },
+  { en: "asset", ja: "資産" },
+  { en: "revolt", ja: "反乱" },
+  { en: "remainder", ja: "残り" },
+  { en: "breeze", ja: "そよ風" },
+  { en: "integrity", ja: "誠実" },
+  { en: "contempt", ja: "軽蔑" },
+  { en: "vanity", ja: "虚栄心" },
+  { en: "gratuity", ja: "心付け" },
+  { en: "kinship", ja: "血縁" },
+  { en: "implications", ja: "含意" },
+  { en: "institution", ja: "機関" },
+  { en: "impersonation", ja: "なりすまし" },
+  { en: "depiction", ja: "描写" },
+  { en: "menace", ja: "脅威" },
+  { en: "intent", ja: "意図" },
+  { en: "terrain", ja: "地形" },
+  { en: "stockpile", ja: "備蓄" },
+  { en: "ethnicity", ja: "民族性" },
+  { en: "agitation", ja: "動揺" },
+  { en: "sanitation", ja: "衛生" },
+  { en: "coverage", ja: "報道範囲" },
+  { en: "disposal", ja: "処分" },
+  { en: "mobility", ja: "移動性" },
+  { en: "eternity", ja: "永遠" },
+  { en: "casualty", ja: "死傷者" },
+  { en: "ingenuity", ja: "独創性" },
+  { en: "disclosure", ja: "開示" },
+  { en: "breach", ja: "侵害" },
+  { en: "stature", ja: "身長／評価" },
+  { en: "frailty", ja: "虚弱" },
+  { en: "maternity", ja: "母性" },
+  { en: "fidelity", ja: "忠誠" },
+  { en: "relegation", ja: "降格" },
+  { en: "distinction", ja: "区別" },
+  { en: "contradiction", ja: "矛盾" },
+  { en: "precaution", ja: "予防策" },
+  { en: "converge", ja: "集中する" },
+  { en: "condiment", ja: "調味料" },
+  { en: "boundary", ja: "境界" },
+  { en: "novelty", ja: "新奇性" },
+  { en: "principle", ja: "原則" },
+  { en: "ordeal", ja: "試練" },
+  { en: "scam", ja: "詐欺" },
+  { en: "barrel", ja: "樽" },
+  { en: "shriek", ja: "悲鳴" },
+  { en: "rhetoric", ja: "修辞" },
+  { en: "ditch", ja: "溝" },
+  { en: "intellect", ja: "知性" },
+  { en: "gale", ja: "強風" },
+  { en: "rivalry", ja: "競争" },
+  { en: "stall", ja: "失速" },
+  { en: "lump", ja: "塊" },
+  { en: "dent", ja: "へこみ" },
+  { en: "facade", ja: "外観" },
+  { en: "blast", ja: "爆発" },
+  { en: "commemoration", ja: "記念" },
+  { en: "proposition", ja: "提案" },
+  { en: "pretension", ja: "見せかけ" },
+  { en: "engagement", ja: "約束／婚約" },
+  { en: "oppression", ja: "抑圧" },
+  { en: "uproar", ja: "騒動" },
+  { en: "procurement", ja: "調達" },
+  { en: "ornament", ja: "装飾" },
+  { en: "amendment", ja: "修正" },
+  { en: "subscription", ja: "購読" },
+  { en: "assertion", ja: "主張" },
+  { en: "forgery", ja: "偽造" },
+  { en: "buffer", ja: "緩衝" },
+  { en: "remnant", ja: "残骸" },
+  { en: "apprehension", ja: "不安" },
+  { en: "temptation", ja: "誘惑" },
+  { en: "demotion", ja: "降格" },
+  { en: "flaw", ja: "欠陥" },
+  { en: "interlude", ja: "幕間" },
+  { en: "faith", ja: "信頼" },
+  { en: "conflict", ja: "対立" },
+  { en: "quota", ja: "割当" },
+  { en: "brand", ja: "商標" },
+  { en: "remark", ja: "発言" },
+  { en: "heredity", ja: "遺伝" },
+  { en: "curfew", ja: "門限" },
+  { en: "conversion", ja: "転換" },
+  { en: "restraint", ja: "抑制" },
+  { en: "epidemic", ja: "流行病" },
+  { en: "portion", ja: "部分" },
+  { en: "turnover", ja: "回転率" },
+  { en: "precedent", ja: "前例" },
+  { en: "omission", ja: "省略" },
+  { en: "tolerance", ja: "寛容" },
+  { en: "accessory", ja: "付属品" },
+  { en: "wreck", ja: "難破" },
+  { en: "pileup", ja: "多重事故" },
+  { en: "boost", ja: "増加" },
+  { en: "observance", ja: "遵守" },
+  { en: "proportion", ja: "割合" },
+  { en: "glimpse", ja: "一瞥" },
+  { en: "discord", ja: "不和" },
+  { en: "ridge", ja: "尾根" },
+  { en: "calamity", ja: "災害" },
+  { en: "blister", ja: "水ぶくれ" },
+  { en: "disobedience", ja: "不服従" },
+  { en: "verge", ja: "瀬戸際" },
+  { en: "margin", ja: "余白" },
+  { en: "diameter", ja: "直径" },
+  { en: "crude", ja: "粗野な／未精製の" },
+  { en: "lofty", ja: "高尚な" },
+  { en: "legible", ja: "判読できる" },
+  { en: "deceitful", ja: "不誠実な" },
+  { en: "inherent", ja: "本来備わった" },
+  { en: "persuasive", ja: "説得力のある" },
+  { en: "stingy", ja: "けちな" },
+  { en: "reparable", ja: "修復可能な" },
+  { en: "mellow", ja: "円熟した" },
+  { en: "implied", ja: "暗示された" },
+  { en: "paternal", ja: "父親の" },
+  { en: "serene", ja: "穏やかな" },
+  { en: "amicable", ja: "友好的な" },
+  { en: "customary", ja: "慣習的な" },
+  { en: "elastic", ja: "弾力のある" },
+  { en: "inept", ja: "不器用な" },
+  { en: "inclusive", ja: "包括的な" },
+  { en: "commendable", ja: "称賛に値する" },
+  { en: "extravagant", ja: "浪費的な" },
+  { en: "subordinate", ja: "従属した" },
+  { en: "palpable", ja: "明白な" },
+  { en: "invalid", ja: "無効な" },
+  { en: "vintage", ja: "年代物の" },
+  { en: "compelling", ja: "説得力のある" },
+  { en: "expandable", ja: "拡張可能な" },
+  { en: "filthy", ja: "汚い" },
+  { en: "blurry", ja: "ぼやけた" },
+  { en: "wicked", ja: "邪悪な" },
+  { en: "ominous", ja: "不吉な" },
+  { en: "acoustic", ja: "音響の" },
+  { en: "unsound", ja: "健全でない" },
+  { en: "mythical", ja: "神話の" },
+  { en: "cunning", ja: "ずる賢い" },
+  { en: "incensed", ja: "激怒した" },
+  { en: "illiterate", ja: "読み書きできない" },
+  { en: "hereditary", ja: "遺伝の" },
+  { en: "obsolete", ja: "時代遅れの" },
+  { en: "wholesome", ja: "健康によい" },
+  { en: "commercial", ja: "商業の" },
+  { en: "irresistible", ja: "抵抗できない" },
+  { en: "honorary", ja: "名誉の" },
+  { en: "compassionate", ja: "思いやりのある" },
+  { en: "reliable", ja: "信頼できる" },
+  { en: "adrift", ja: "漂流して" },
+  { en: "candid", ja: "率直な" },
+  { en: "skeptical", ja: "懐疑的な" },
+  { en: "tender", ja: "優しい" },
+  { en: "innumerable", ja: "無数の" },
+  { en: "resilient", ja: "回復力のある" },
+  { en: "coarse", ja: "粗い" },
+  { en: "noble", ja: "高貴な" },
+  { en: "perilous", ja: "危険な" },
+  { en: "primitive", ja: "原始的な" },
+  { en: "judicious", ja: "賢明な" },
+  { en: "intangible", ja: "無形の" },
+  { en: "irreversible", ja: "元に戻せない" },
+  { en: "uniform", ja: "均一な" },
+  { en: "abridged", ja: "要約された" },
+  { en: "imperative", ja: "不可欠な" },
+  { en: "vulgar", ja: "下品な" },
+  { en: "dissimilar", ja: "似ていない" },
+  { en: "immaterial", ja: "重要でない" },
+  { en: "blatant", ja: "露骨な" },
+  { en: "relevant", ja: "関連した" },
+  { en: "hectic", ja: "多忙な" },
+  { en: "fictional", ja: "架空の" },
+  { en: "sanitary", ja: "衛生的な" },
+  { en: "daring", ja: "大胆な" },
+  { en: "tempting", ja: "魅力的な" },
+  { en: "unbending", ja: "屈しない" },
+  { en: "bend", ja: "曲がる" },
+  { en: "famished", ja: "飢えた" },
+  { en: "renowned", ja: "有名な" },
+  { en: "instinctive", ja: "本能的な" },
+  { en: "valid", ja: "有効な" },
+  { en: "grumpy", ja: "不機嫌な" },
+  { en: "viable", ja: "実行可能な" },
+  { en: "gracious", ja: "親切な" },
+  { en: "hasty", ja: "急ぎの" },
+  { en: "possessive", ja: "所有欲の強い" },
+  { en: "modified", ja: "修正された" },
+  { en: "spherical", ja: "球形の" },
+  { en: "bleak", ja: "荒涼とした" },
+  { en: "legitimate", ja: "正当な" },
+  { en: "fragrant", ja: "香りのよい" },
+  { en: "crunchy", ja: "歯ごたえのある" },
+  { en: "peculiar", ja: "独特な" },
+  { en: "entangled", ja: "もつれた" },
+  { en: "falsified", ja: "改ざんされた" },
+  { en: "humble", ja: "謙虚な" },
+  { en: "spacious", ja: "広々した" },
+  { en: "satisfactory", ja: "満足できる" },
+  { en: "tranquil", ja: "静かな" },
+  { en: "straightforward", ja: "率直な" },
+  { en: "virtuous", ja: "高潔な" },
+  { en: "aromatic", ja: "香りのある" },
+  { en: "binding", ja: "拘束力のある" },
+  { en: "parental", ja: "親の" },
+  { en: "graphic", ja: "生々しい" },
+  { en: "solemn", ja: "厳粛な" },
+  { en: "proficient", ja: "熟達した" },
+  { en: "sweltering", ja: "うだるように暑い" },
+  { en: "duplicated", ja: "複製された" },
+  { en: "weary", ja: "疲れた" },
+  { en: "mediocre", ja: "平凡な" },
+  { en: "righteous", ja: "正義の" },
+  { en: "preparatory", ja: "準備の" },
+  { en: "savage", ja: "野蛮な" },
+  { en: "habitual", ja: "習慣的な" },
+  { en: "discreet", ja: "慎重な" },
+  { en: "accessible", ja: "利用しやすい" },
+  { en: "incurable", ja: "不治の" },
+  { en: "prime", ja: "最盛期の" },
+  { en: "grouchy", ja: "不機嫌な" },
+  { en: "linear", ja: "直線の" },
+  { en: "scented", ja: "香りのついた" },
+  { en: "modest", ja: "控えめな" },
+  { en: "impulsive", ja: "衝動的な" },
+  { en: "dreary", ja: "陰鬱な" },
+  { en: "charitable", ja: "慈善の" },
+  { en: "comparable", ja: "比較できる" },
+  { en: "distressing", ja: "悲惨な" },
+  { en: "deficient", ja: "不足した" },
+  { en: "merciful", ja: "慈悲深い" },
+  { en: "cumulative", ja: "累積の" },
+  { en: "questionable", ja: "疑わしい" },
+  { en: "immodest", ja: "控えめでない" },
+  { en: "dense", ja: "密集した" },
+  { en: "imposing", ja: "印象的な" },
+  { en: "dismal", ja: "陰惨な" },
+  { en: "oblivious", ja: "気づいていない" },
+  { en: "prescriptive", ja: "規定の" },
+  { en: "courageous", ja: "勇敢な" },
+  { en: "steep", ja: "急な" },
+  { en: "unwarranted", ja: "不当な" },
+  { en: "uneasy", ja: "不安な" },
+  { en: "uneventful", ja: "変化のない" },
+  { en: "unbalanced", ja: "不均衡な" },
+  { en: "deceased", ja: "死亡した" },
+  { en: "obliged", ja: "義務を負った" },
+  { en: "tangled", ja: "絡まった" },
+  { en: "untouched", ja: "未使用の" },
+  { en: "barely", ja: "かろうじて" },
+  { en: "logistically", ja: "物流上" },
+  { en: "coincidental", ja: "偶然の" },
+  { en: "intentional", ja: "意図的な" },
+  { en: "disastrous", ja: "悲惨な" },
+  { en: "observant", ja: "注意深い" },
+  { en: "redundant", ja: "余分な" },
+  { en: "dubious", ja: "疑わしい" },
+  { en: "sheltered", ja: "保護された" },
+  { en: "assertive", ja: "自己主張の強い" },
+  { en: "fateful", ja: "運命的な" },
+  { en: "unrivaled", ja: "無比の" },
+  { en: "dejected", ja: "落胆した" },
+  { en: "disabled", ja: "障害のある" },
+  { en: "inherited", ja: "受け継いだ" },
+  { en: "endorsed", ja: "支持された" },
+  { en: "acutely", ja: "鋭く" },
+  { en: "crudely", ja: "粗雑に" },
+  { en: "glossy", ja: "つやのある" },
+  { en: "identical", ja: "同一の" },
+  { en: "divisive", ja: "分裂を招く" },
+  { en: "contagious", ja: "感染性の" },
+  { en: "nostalgic", ja: "懐かしむ" },
+  { en: "rash", ja: "軽率な" },
+  { en: "rigid", ja: "厳格な" },
+  { en: "desirable", ja: "望ましい" },
+  { en: "pressing", ja: "差し迫った" },
+  { en: "variable", ja: "変わりやすい" },
+  { en: "parasitic", ja: "寄生の" },
+  { en: "forthcoming", ja: "来たるべき" },
+  { en: "thunderous", ja: "雷鳴のような" },
+  { en: "fatal", ja: "致命的な" },
+  { en: "bossy", ja: "横柄な" },
+  { en: "feeble", ja: "弱々しい" },
+  { en: "stealthy", ja: "こっそりした" },
+  { en: "irrelevant", ja: "無関係な" },
+  { en: "eventful", ja: "出来事の多い" },
+  { en: "entrusted", ja: "託された" },
+  { en: "explanatory", ja: "説明的な" },
+  { en: "obligated", ja: "義務づけられた" },
+  { en: "animated", ja: "活気のある" },
+  { en: "damp", ja: "湿った" },
+  { en: "plentiful", ja: "豊富な" },
+  { en: "predictable", ja: "予測可能な" },
+  { en: "void", ja: "空の" },
+  { en: "lean", ja: "やせた" },
+  { en: "manic", ja: "躁状態の" },
+  { en: "incessant", ja: "絶え間ない" },
+  { en: "unstable", ja: "不安定な" },
+  { en: "soaked", ja: "びしょ濡れの" },
+  { en: "captive", ja: "捕虜の" },
+  { en: "muddy", ja: "泥だらけの" },
+  { en: "pathetic", ja: "哀れな" },
+  { en: "dispensable", ja: "不要な" },
+  { en: "clerical", ja: "事務の" },
+  { en: "uptight", ja: "神経質な" },
+  { en: "extensive", ja: "広範囲の" },
+  { en: "alleviated", ja: "和らげられた" },
+  { en: "integral", ja: "不可欠な" },
+  { en: "cramped", ja: "窮屈な" },
+  { en: "obsessed", ja: "取りつかれた" },
+  { en: "petty", ja: "些細な" },
+  { en: "fussy", ja: "気難しい" },
+  { en: "sloppy", ja: "だらしない" },
+  { en: "feasible", ja: "実行可能な" },
+  { en: "finite", ja: "有限の" },
+  { en: "splendid", ja: "素晴らしい" },
+  { en: "crooked", ja: "曲がった" },
+  { en: "consecutive", ja: "連続した" },
+  { en: "stern", ja: "厳しい" },
+  { en: "sinister", ja: "不吉な" },
+  { en: "nauseous", ja: "吐き気を催す" },
+  { en: "infinite", ja: "無限の" },
+  { en: "adverse", ja: "不利な" },
+  { en: "cheery", ja: "陽気な" },
+  { en: "informative", ja: "有益な" },
+  { en: "cozy", ja: "居心地のよい" },
+  { en: "parallel", ja: "平行の" },
+  { en: "chronological", ja: "年代順の" },
+  { en: "victorious", ja: "勝利した" },
+  { en: "comical", ja: "滑稽な" },
+  { en: "offensive", ja: "不快な" },
+  { en: "mundane", ja: "ありふれた" },
+  { en: "persistent", ja: "粘り強い" },
+  { en: "sympathetic", ja: "同情的な" },
+  { en: "disagreeable", ja: "不快な" },
+  { en: "unanimous", ja: "全会一致の" },
+  { en: "continuous", ja: "連続した" },
+  { en: "touchy", ja: "扱いにくい" },
+  { en: "slender", ja: "細い" },
+  { en: "worthwhile", ja: "価値のある" },
+  { en: "impartial", ja: "公平な" },
+  { en: "insane", ja: "正気でない" },
+  { en: "inessential", ja: "重要でない" },
+  { en: "timid", ja: "臆病な" },
+  { en: "bare", ja: "むき出しの" },
+  { en: "stray", ja: "迷った" },
+  { en: "brisk", ja: "活発な" },
+  { en: "wholesale", ja: "大量の" },
+  { en: "erratic", ja: "不規則な" },
+  { en: "arduous", ja: "骨の折れる" },
+  { en: "paranoid", ja: "妄想的な" },
+  { en: "selective", ja: "選択的な" },
+  { en: "immense", ja: "莫大な" },
+  { en: "greedy", ja: "貪欲な" },
+  { en: "rusty", ja: "さびた" },
+  { en: "abandoned", ja: "放棄された" },
+  { en: "oppressive", ja: "抑圧的な" },
+  { en: "slack", ja: "緩んだ" },
+  { en: "translucent", ja: "半透明の" },
+  { en: "editorial", ja: "社説の" },
+  { en: "indicative", ja: "示唆的な" },
+  { en: "adjustable", ja: "調整可能な" },
+  { en: "communal", ja: "共同の" },
+  { en: "cowardly", ja: "臆病な" },
+  { en: "profound", ja: "深い" },
+  { en: "flammable", ja: "可燃性の" },
+  { en: "intricate", ja: "複雑な" },
+  { en: "fierce", ja: "激しい" },
+  { en: "concise", ja: "簡潔な" },
+  { en: "formidable", ja: "手強い" },
+  { en: "crisp", ja: "歯切れのよい" },
+  { en: "delirious", ja: "錯乱した" },
+  { en: "wretched", ja: "惨めな" },
+  { en: "concerted", ja: "協力した" },
+  { en: "frank", ja: "率直な" },
+  { en: "vibrant", ja: "活気ある" },
+  { en: "contractual", ja: "契約上の" },
+  { en: "excusable", ja: "許される" },
+  { en: "decent", ja: "まともな" },
+  { en: "faulty", ja: "欠陥のある" },
+  { en: "adorable", ja: "愛らしい" },
+  { en: "allied", ja: "同盟の" },
+  { en: "secluded", ja: "人里離れた" },
+  { en: "unified", ja: "統一された" },
+  { en: "functional", ja: "機能的な" },
+  { en: "audible", ja: "聞こえる" },
+  { en: "desperate", ja: "必死の" },
+  { en: "inactive", ja: "不活発な" },
+  { en: "uplifting", ja: "元気づける" },
+  { en: "egotistical", ja: "自己中心的な" },
+  { en: "incisive", ja: "鋭い" },
+  { en: "unreasonable", ja: "理不尽な" },
+  { en: "resentful", ja: "憤慨した" },
+  { en: "unwittingly", ja: "無意識に" },
+  { en: "stoically", ja: "冷静に" },
+  { en: "hypocritical", ja: "偽善的な" },
+  { en: "portable", ja: "携帯用の" },
+  { en: "intermittently", ja: "断続的に" },
+  { en: "credibly", ja: "信頼できる形で" },
+  { en: "menacingly", ja: "脅迫的に" },
+  { en: "doubtfully", ja: "疑わしげに" },
+  { en: "majestic", ja: "荘厳な" },
+  { en: "absurd", ja: "ばかげた" },
+  { en: "treacherous", ja: "裏切りの" },
+  { en: "divinely", ja: "神々しく" },
+  { en: "notably", ja: "特に" },
+  { en: "manually", ja: "手作業で" },
+  { en: "insistent", ja: "しつこい" },
+  { en: "drowsy", ja: "眠い" },
+  { en: "stale", ja: "新鮮でない" },
+  { en: "striking", ja: "印象的な" },
+  { en: "indulgent", ja: "甘い" },
+  { en: "attentive", ja: "注意深い" },
+  { en: "gratifying", ja: "満足感のある" },
+  { en: "inspiring", ja: "刺激的な" },
+  { en: "conflicting", ja: "対立する" },
+  { en: "discriminating", ja: "識別力のある" },
+  { en: "distinctively", ja: "独特に" },
+  { en: "regularly", ja: "規則的に" },
+  { en: "innately", ja: "生まれつき" },
+  { en: "aimless", ja: "目的のない" },
+  { en: "courteous", ja: "礼儀正しい" },
+  { en: "negligent", ja: "怠慢な" },
+  { en: "sane", ja: "正気の" },
+  { en: "imperfect", ja: "不完全な" },
+  { en: "primary", ja: "主要な" },
+  { en: "prevalent", ja: "広まった" },
+  { en: "expectant", ja: "期待している" },
+  { en: "residential", ja: "住宅の" },
+  { en: "deserted", ja: "見捨てられた" },
+  { en: "advisable", ja: "賢明な" },
+  { en: "enclosed", ja: "囲まれた" },
+  { en: "blameless", ja: "非の打ち所のない" },
+  { en: "gaudy", ja: "派手な" },
+  { en: "concealed", ja: "隠された" },
+  { en: "jumbled", ja: "ごちゃ混ぜの" },
+  { en: "permissive", ja: "寛容な" },
+  { en: "villainous", ja: "悪意のある" },
+  { en: "resistant", ja: "抵抗する" },
+  { en: "tasteless", ja: "趣味の悪い" },
+  { en: "flashy", ja: "派手な" },
+  { en: "nosy", ja: "詮索好きな" },
+  { en: "drastic", ja: "抜本的な" },
+  { en: "upscale", ja: "高級な" },
+  { en: "articulate", ja: "はっきり話す" },
+  { en: "obstinate", ja: "頑固な" },
+  { en: "incidental", ja: "付随的な" },
+  { en: "spoiled", ja: "甘やかされた" },
+  { en: "flawed", ja: "欠陥のある" },
+  { en: "assorted", ja: "取り混ぜた" },
+  { en: "demoted", ja: "降格された" },
+  { en: "furnished", ja: "家具付きの" },
+  { en: "directed", ja: "指示された" },
+  { en: "perplexed", ja: "困惑した" },
+  { en: "insoluble", ja: "解決できない" },
+  { en: "overcast", ja: "曇った" },
+  { en: "defective", ja: "欠陥のある" },
+  { en: "rotten", ja: "腐った" },
+  { en: "recurrent", ja: "繰り返す" },
+  { en: "frosty", ja: "冷淡な" }
+];
+
+/* =========================
+   Utils
+========================= */
+const $ = (id) => document.getElementById(id);
+
+const LS = {
+  get(key, fallback){
+    try{
+      const v = localStorage.getItem(key);
+      return v == null ? fallback : JSON.parse(v);
+    }catch{ return fallback; }
+  },
+  set(key, value){
+    try{ localStorage.setItem(key, JSON.stringify(value)); }catch{}
+  }
+};
+
+const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
+
+/* =========================
+   Voice utility（英語音声選択）
+========================= */
+function pickEnglishVoice(){
+  const voices = speechSynthesis.getVoices() || [];
+  return (
+    voices.find(v => v.lang === "en-US" && /Alex/i.test(v.name)) ||
+    voices.find(v => v.lang === "en-US") ||
+    voices.find(v => v.lang.startsWith("en-"))
+  ) || null;
+}
+
+let cachedEnglishVoice = null;
+
+if ("speechSynthesis" in window) {
+  speechSynthesis.onvoiceschanged = () => {
+    cachedEnglishVoice = pickEnglishVoice();
+  };
+}
+
+const toInt = (v, fallback) => {
+  const n = Number(v);
+  return Number.isFinite(n) ? Math.trunc(n) : fallback;
+};
+const escapeHtml = (s) => String(s ?? "")
+  .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+  .replaceAll('"',"&quot;").replaceAll("'","&#39;");
+
+/* =========================
+   Elements
+========================= */
+const pageTitle = $("pageTitle");
+const progressEl = $("progress");
+const wordTextEl = $("wordText");
+const meaningEl = $("meaning");
+const wordNumHeader = $("wordNumHeader");
+
+const nextBtn = $("nextBtn");
+const resetBtn = $("resetBtn");
+const clearWrongBtn = $("clearWrongBtn");
+
+const wrongOnlyToggle = $("wrongOnlyToggle");
+const wrongCount = $("wrongCount");
+
+const missBox = $("missBox");
+const missToggle = $("missToggle");
+
+const autoBtn = $("autoBtn");
+const audioToggle = $("audioToggle");
+const themeToggle = $("themeToggle");
+const orderToggle = $("orderToggle");
+
+const rangeFrom = $("rangeFrom");
+const rangeTo = $("rangeTo");
+
+const wheelOpenBtn = $("wheelOpenBtn");
+const speakBtn = $("speakBtn");
+
+const rateRange = $("rateRange");
+const rateLabel = $("rateLabel");
+
+const autoEnMsInput = $("autoEnMs");
+const autoJaMsInput = $("autoJaMs");
+const autoTimeResetBtn = $("autoTimeResetBtn");
+
+const wakeBadge = $("wakeBadge");
+const wakeDot = $("wakeDot");
+const wakeText = $("wakeText");
+
+/* wheel */
+const wheelOverlay = $("wheelOverlay");
+const wheelCloseBtn = $("wheelCloseBtn");
+const wheelSearchInput = $("wheelSearchInput");
+const wheelClearSearchBtn = $("wheelClearSearchBtn");
+const wheelList = $("wheelList");
+const wheelViewport = $("wheelViewport");
+const wheelJumpBtn = $("wheelJumpBtn");
+const wheelHint = $("wheelHint");
+
+/* =========================
+   State
+   - APPごとのlocalStorage衝突を避けるため title をキー化
+========================= */
+const APP_ID  = (document.title || "vocab").replace(/\s+/g, "_");
+const APP_KEY = `ei_idiom_state_v3__${APP_ID}`;
+
+const state = {
+  idx: 0,
+  orderRandom: false,
+  audioOn: true,
+  dark: false,
+
+  wrongSet: {},      // { realIndex: true }
+  wrongOnly: false,
+
+  rangeFrom: 1,
+  rangeTo: VOCAB.length,
+
+  shuffled: [],      // 実index配列（範囲＆復習で作る）
+  started: false,
+  phase: 0,          // 0:英/出題, 1:日/答え
+
+  rate: 1.0,
+
+  autoOn: false,
+  autoEnMs: 1500,
+  autoJaMs: 1000,
+
+  vocabLen: VOCAB.length
+};
+
+function loadState(){
+  const saved = LS.get(APP_KEY, null);
+  if(!saved) return;
+
+  const b = (k, t) => (typeof saved[k] === t);
+  if(b("idx","number")) state.idx = saved.idx;
+  if(b("orderRandom","boolean")) state.orderRandom = saved.orderRandom;
+  if(b("audioOn","boolean")) state.audioOn = saved.audioOn;
+  if(b("dark","boolean")) state.dark = saved.dark;
+  if(saved.wrongSet && typeof saved.wrongSet === "object") state.wrongSet = saved.wrongSet;
+  if(b("wrongOnly","boolean")) state.wrongOnly = saved.wrongOnly;
+
+  if(b("rangeFrom","number")) state.rangeFrom = saved.rangeFrom;
+  if(b("rangeTo","number")) state.rangeTo = saved.rangeTo;
+
+  if(Array.isArray(saved.shuffled)) state.shuffled = saved.shuffled;
+
+  if(b("started","boolean")) state.started = saved.started;
+  if(b("phase","number")) state.phase = saved.phase;
+
+  if(b("rate","number")) state.rate = saved.rate;
+
+  if(b("autoOn","boolean")) state.autoOn = saved.autoOn;
+  if(b("autoEnMs","number")) state.autoEnMs = saved.autoEnMs;
+  if(b("autoJaMs","number")) state.autoJaMs = saved.autoJaMs;
+
+  /* 語数が違うアプリ/更新なら安全に初期化 */
+  if(typeof saved.vocabLen === "number" && saved.vocabLen !== VOCAB.length){
+    state.idx = 0;
+    state.started = false;
+    state.phase = 0;
+    state.wrongSet = {};
+    state.wrongOnly = false;
+    state.rangeFrom = 1;
+    state.rangeTo = VOCAB.length;
+    state.shuffled = [];
+  }
+
+  state.vocabLen = VOCAB.length;
+}
+
+function saveState(){
+  LS.set(APP_KEY, state);
+}
+
+/* =========================
+   Order / Range
+========================= */
+function inRangeIndices(){
+  const a = clamp(toInt(state.rangeFrom, 1), 1, VOCAB.length);
+  const b = clamp(toInt(state.rangeTo, VOCAB.length), 1, VOCAB.length);
+  const lo = Math.min(a, b);
+  const hi = Math.max(a, b);
+  const arr = [];
+  for(let i = lo - 1; i <= hi - 1; i++) arr.push(i);
+  return arr;
+}
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function buildOrder(){
+  const base = inRangeIndices();
+  const pool = state.wrongOnly ? base.filter(i => state.wrongSet[i]) : base;
+
+  if(pool.length === 0){
+    state.shuffled = [];
+    state.idx = 0;
+    return;
+  }
+  state.shuffled = state.orderRandom ? shuffle(pool) : pool;
+  state.idx = 0;
+}
+
+function currentRealIndex(){
+  if(state.shuffled.length === 0) return null;
+  return state.shuffled[clamp(state.idx, 0, state.shuffled.length - 1)];
+}
+
+function syncRangeConstraints(){
+  rangeFrom.max = String(state.rangeTo);
+  rangeTo.min   = String(state.rangeFrom);
+
+  rangeFrom.value = String(state.rangeFrom);
+  rangeTo.value   = String(state.rangeTo);
+}
+
+/* =========================
+   Speech
+========================= */
+function speak(text){
+  if(!state.audioOn) return;
+  if(!("speechSynthesis" in window)) return;
+
+  try{ speechSynthesis.cancel(); }catch(e){}
+
+  // ★ iPad対策：まだ取れてなければ毎回拾い直す
+  if(!cachedEnglishVoice){
+    cachedEnglishVoice = pickEnglishVoice();
+  }
+
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "en-US";
+  u.rate = clamp(Number(state.rate) || 1.0, 0.6, 1.4);
+
+  if (cachedEnglishVoice) u.voice = cachedEnglishVoice;
+
+  speechSynthesis.speak(u);
+}
+
+
+
+function speakCurrent(){
+  const real = currentRealIndex();
+  if(real == null) return;
+  speak(VOCAB[real].en);
+}
+
+/* =========================
+   Wake Lock
+========================= */
+let wakeLockSentinel = null;
+let wakeKeepAliveTimer = 0;
+
+function setWakeUI(on, reason){
+  wakeBadge.classList.toggle("show", !!state.autoOn);
+  wakeDot.classList.toggle("on", !!on);
+  wakeDot.classList.toggle("off", !on);
+  wakeText.textContent = on ? "Wake: ON" : "Wake: OFF";
+  if(reason && state.autoOn) wakeBadge.title = reason;
+}
+
+async function requestWakeLock(){
+  setWakeUI(false, "WakeLockを取得中…");
+  try{
+    if("wakeLock" in navigator && navigator.wakeLock?.request){
+      wakeLockSentinel = await navigator.wakeLock.request("screen");
+      setWakeUI(true, "WakeLock: Screen Wake Lock APIで維持中");
+
+      wakeLockSentinel.addEventListener("release", () => {
+        wakeLockSentinel = null;
+        if(state.autoOn && document.visibilityState === "visible"){
+          requestWakeLock().catch(()=>{});
+        }else{
+          setWakeUI(false, "WakeLock: OFF");
+        }
+      });
+      return;
+    }
+  }catch{}
+
+  /* iPhone Safari等のフォールバック（擬似 keep-alive） */
+  clearInterval(wakeKeepAliveTimer);
+  wakeKeepAliveTimer = setInterval(() => { void Date.now(); }, 25_000);
+  setWakeUI(false, "このブラウザはWakeLock非対応の可能性があります（iPhone Safari等）。Auto中は時々画面をタップすると維持しやすいです。");
+}
+
+async function releaseWakeLock(){
+  try{ if(wakeLockSentinel) await wakeLockSentinel.release(); }catch{}
+  wakeLockSentinel = null;
+
+  if(wakeKeepAliveTimer){
+    clearInterval(wakeKeepAliveTimer);
+    wakeKeepAliveTimer = 0;
+  }
+  setWakeUI(false, "WakeLock: OFF");
+}
+
+document.addEventListener("visibilitychange", () => {
+  if(!state.autoOn) return;
+  if(document.visibilityState === "visible"){
+    requestWakeLock().catch(()=>{});
+  }
+});
+
+/* =========================
+   Render / UI
+========================= */
+function updateAutoBtn(){
+  autoBtn.textContent = state.autoOn ? "⏸ Auto" : "▶︎ Auto";
+}
+
+function updateTopUI(){
+  const total = state.shuffled.length;
+  const cur = (!state.started || !total) ? 0 : (state.idx + 1);
+  progressEl.textContent = `${cur} / ${total}`;
+
+  const real = currentRealIndex();
+  wordNumHeader.textContent = (!state.started || real == null) ? "" : String(real + 1);
+
+  wrongOnlyToggle.checked = !!state.wrongOnly;
+  orderToggle.textContent = state.orderRandom ? "🔀" : "🔢";
+  audioToggle.textContent = state.audioOn ? "🔊" : "🔇";
+  themeToggle.textContent = state.dark ? "🌙" : "☀️";
+
+  /* 復習カウント：範囲内の復習数 */
+  const base = inRangeIndices();
+  const cnt = base.filter(i => state.wrongSet[i]).length;
+  wrongCount.textContent = `(${cnt})`;
+
+  rateRange.value = String(state.rate);
+  rateLabel.textContent = `${state.rate.toFixed(1)}x`;
+
+  autoEnMsInput.value = String(state.autoEnMs);
+  autoJaMsInput.value = String(state.autoJaMs);
+
+  syncRangeConstraints();
+  updateAutoBtn();
+}
+
+function render(){
+  pageTitle.textContent = document.title;
+
+  const real = currentRealIndex();
+  updateTopUI();
+
+  if(real != null){
+    missToggle.checked = !!state.wrongSet[real];
+  }
+
+  if(real == null){
+    wordTextEl.textContent = "リストが空です";
+    meaningEl.textContent = "範囲を広げるか、「復習」をOFFにするか、復習リストを登録してね";
+    nextBtn.textContent = "はじめる";
+    state.started = false;
+    state.phase = 0;
+    missBox.classList.remove("show");
+    missToggle.checked = false;
+    saveState();
+    return;
+  }
+
+  if(!state.started){
+    wordTextEl.textContent = "Ready Steady GO!";
+    meaningEl.textContent = "";
+    nextBtn.textContent = "はじめる";
+    missBox.classList.remove("show");
+    missToggle.checked = false;
+    saveState();
+    return;
+  }
+
+  const item = VOCAB[real];
+  wordTextEl.textContent = item.en;
+
+if(state.phase === 0){
+  meaningEl.textContent = "";
+  nextBtn.textContent = "日本語訳を確認（答え合わせ）";
+}else{
+  meaningEl.textContent = item.ja;
+  nextBtn.textContent = "正解だったかな？ 次の単語へ！";
+}
+
+/* ★ 常時表示 */
+missBox.classList.add("show");
+
+/* ★ チェック状態は常に現在の単語に同期 */
+missToggle.checked = !!state.wrongSet[real];
+
+
+  saveState();
+}
+
+/* =========================
+   Manual controls
+========================= */
+let autoTimer = 0;
+
+function stopAuto(){
+  state.autoOn = false;
+  if(autoTimer) clearTimeout(autoTimer);
+  autoTimer = 0;
+  updateAutoBtn();
+  saveState();
+  releaseWakeLock().catch(()=>{});
+}
+
+function startOrAdvance(){
+  stopAuto();
+
+  const real = currentRealIndex();
+  if(real == null){ render(); return; }
+
+  if(!state.started){
+    state.started = true;
+    state.phase = 0;
+    render();
+    speakCurrent();
+    return;
+  }
+
+  if(state.phase === 0){
+    state.phase = 1;
+    render();
+    return;
+  }
+
+  state.idx = (state.idx >= state.shuffled.length - 1) ? 0 : state.idx + 1;
+  state.phase = 0;
+  render();
+  speakCurrent();
+}
+
+function hardReset(){
+  stopAuto();
+  state.idx = 0;
+  state.started = false;
+  state.phase = 0;
+  buildOrder();
+  render();
+}
+
+function clearWrong(){
+  stopAuto();
+  state.wrongSet = {};
+  state.idx = 0;
+  state.started = false;
+  state.phase = 0;
+  buildOrder();
+  render();
+}
+
+function applyRangeFromInputs(){
+  stopAuto();
+
+  let from = clamp(toInt(rangeFrom.value, 1), 1, VOCAB.length);
+  let to   = clamp(toInt(rangeTo.value, VOCAB.length), 1, VOCAB.length);
+
+  /* ルール：from > to を許さない */
+  if(from > to) from = to;
+
+  state.rangeFrom = from;
+  state.rangeTo   = to;
+
+  buildOrder();
+  state.started = false;
+  state.phase = 0;
+  render();
+}
+
+/* =========================
+   Auto
+========================= */
+function scheduleAuto(ms){
+  if(autoTimer) clearTimeout(autoTimer);
+  autoTimer = setTimeout(autoTick, ms);
+}
+
+function startAuto(){
+  const real = currentRealIndex();
+  if(real == null) return;
+
+  state.autoOn = true;
+  updateAutoBtn();
+  saveState();
+
+  requestWakeLock().catch(()=>{});
+  setWakeUI(!!wakeLockSentinel, wakeBadge.title);
+
+  autoTick();
+}
+
+function autoTick(){
+  if(!state.autoOn) return;
+
+  const real = currentRealIndex();
+  if(real == null){
+    stopAuto();
+    render();
+    return;
+  }
+
+  if(!state.started){
+    state.started = true;
+    state.phase = 0;
+    render();
+    speakCurrent();
+    scheduleAuto(state.autoEnMs);
+    return;
+  }
+
+  if(state.phase === 0){
+    state.phase = 1;
+    render();
+    scheduleAuto(state.autoJaMs);
+    return;
+  }
+
+  state.idx = (state.idx >= state.shuffled.length - 1) ? 0 : state.idx + 1;
+  state.phase = 0;
+  render();
+  speakCurrent();
+  scheduleAuto(state.autoEnMs);
+}
+
+/* Auto時間UI */
+function sanitizeMs(v, min, max, fallback){
+  const n = Number(v);
+  if(!Number.isFinite(n)) return fallback;
+  return clamp(Math.round(n), min, max);
+}
+
+/* =========================
+   Wheel (Search)
+   - 範囲内(＋復習ONなら復習内)だけ候補にする
+========================= */
+let wheelFiltered = [];
+let wheelActiveIndex = 0;
+let wheelSnapTimer = 0;
+
+function wheelCandidateIndices(){
+  const base = inRangeIndices();
+  return state.wrongOnly ? base.filter(i => state.wrongSet[i]) : base;
+}
+function wheelMatch(q, item){
+  if(!q) return true;
+  const s = q.toLowerCase();
+  return (item.en || "").toLowerCase().includes(s) || (item.ja || "").toLowerCase().includes(s);
+}
+
+function updateWheelHint(){
+  const total = wheelFiltered.length;
+  wheelHint.textContent = (total === 0) ? "該当なし" : `${total}件`;
+}
+
+function wheelUpdateActiveClass(){
+  const items = wheelList.querySelectorAll(".wheelItem");
+  items.forEach((li, idx) => li.classList.toggle("isActive", idx === wheelActiveIndex));
+}
+
+function wheelScrollToIndex(i, smooth){
+  const items = wheelList.querySelectorAll(".wheelItem");
+  if(!items.length) return;
+
+  const idx = clamp(i, 0, items.length - 1);
+  const target = items[idx];
+
+  const top = target.offsetTop + (target.offsetHeight / 2) - (wheelViewport.clientHeight / 2);
+  wheelViewport.scrollTo({ top, behavior: smooth ? "smooth" : "auto" });
+
+  wheelActiveIndex = idx;
+  wheelUpdateActiveClass();
+}
+
+function wheelPickNearest(){
+  const items = wheelList.querySelectorAll(".wheelItem");
+  if(!items.length) return 0;
+
+  const centerY = wheelViewport.scrollTop + wheelViewport.clientHeight / 2;
+  let best = 0, bestDist = Infinity;
+
+  items.forEach((el, i) => {
+    const y = el.offsetTop + el.offsetHeight / 2;
+    const d = Math.abs(y - centerY);
+    if(d < bestDist){ bestDist = d; best = i; }
+  });
+  return best;
+}
+
+function wheelSnap(){
+  wheelScrollToIndex(wheelPickNearest(), true);
+}
+
+function renderWheelItems(){
+  wheelList.innerHTML = "";
+  wheelFiltered.forEach((v, idx) => {
+    const li = document.createElement("li");
+    li.className = "wheelItem";
+    li.dataset.index = String(idx);
+    li.innerHTML = `
+      <div class="wheelItemInner">
+        <div class="num">${v.i + 1}</div>
+        <div>
+          <div class="main">${escapeHtml(v.en)}</div>
+          <span class="ja">${escapeHtml(v.ja)}</span>
+        </div>
+      </div>
+    `;
+    wheelList.appendChild(li);
+  });
+
+  wheelActiveIndex = clamp(wheelActiveIndex, 0, Math.max(0, wheelFiltered.length - 1));
+  wheelUpdateActiveClass();
+}
+
+function rebuildWheelList(){
+  const q = (wheelSearchInput.value || "").trim();
+  const candidates = wheelCandidateIndices();
+
+  wheelFiltered = candidates
+    .map(i => ({ ...VOCAB[i], i }))
+    .filter(v => wheelMatch(q, v));
+
+  wheelActiveIndex = 0;
+  renderWheelItems();
+  updateWheelHint();
+  wheelViewport.scrollTop = 0;
+
+  requestAnimationFrame(() => wheelScrollToIndex(0, false));
+}
+
+function openWheel(){
+  stopAuto();
+  wheelOverlay.classList.add("show");
+  wheelOverlay.setAttribute("aria-hidden", "false");
+  wheelSearchInput.value = "";
+  wheelActiveIndex = 0;
+  rebuildWheelList();
+  setTimeout(()=>wheelSearchInput.focus(), 50);
+}
+function closeWheel(){
+  wheelOverlay.classList.remove("show");
+  wheelOverlay.setAttribute("aria-hidden", "true");
+}
+function wheelJumpToSelected(){
+  stopAuto();
+  if(wheelFiltered.length === 0) return;
+
+  const picked = wheelFiltered[wheelActiveIndex];
+  if(!picked) return;
+
+  const pos = state.shuffled.indexOf(picked.i);
+  if(pos < 0){
+    wheelHint.textContent = "この単語は現在の範囲にありません（範囲を広げてください）";
+    return;
+  }
+
+  state.idx = pos;
+  state.started = true;
+  state.phase = 0;
+  render();
+  closeWheel();
+}
+
+/* =========================
+   Events
+========================= */
+nextBtn.addEventListener("click", startOrAdvance);
+resetBtn.addEventListener("click", hardReset);
+clearWrongBtn.addEventListener("click", clearWrong);
+
+autoBtn.addEventListener("click", () => {
+  if(state.autoOn) stopAuto();
+  else startAuto();
+});
+
+wrongOnlyToggle.addEventListener("change", () => {
+  stopAuto();
+  state.wrongOnly = wrongOnlyToggle.checked;
+  buildOrder();
+  state.started = false;
+  state.phase = 0;
+  render();
+});
+
+missToggle.addEventListener("change", () => {
+  const real = currentRealIndex();
+  if(real == null) return;
+
+  if(missToggle.checked) state.wrongSet[real] = true;
+  else delete state.wrongSet[real];
+
+  render(); // count更新も含める
+});
+
+audioToggle.addEventListener("click", () => {
+  stopAuto();
+  state.audioOn = !state.audioOn;
+  if(!state.audioOn){
+    try{ window.speechSynthesis.cancel(); }catch{}
+  }
+  render();
+});
+
+themeToggle.addEventListener("click", () => {
+  stopAuto();
+  state.dark = !state.dark;
+  document.body.classList.toggle("dark", state.dark);
+  render();
+});
+
+orderToggle.addEventListener("click", () => {
+  stopAuto();
+  state.orderRandom = !state.orderRandom;
+  buildOrder();
+  state.started = false;
+  state.phase = 0;
+  render();
+});
+
+/* range */
+rangeFrom.addEventListener("change", applyRangeFromInputs);
+rangeTo.addEventListener("change", applyRangeFromInputs);
+
+/* rate */
+rateRange.addEventListener("input", () => {
+  state.rate = Number(rateRange.value);
+  rateLabel.textContent = `${state.rate.toFixed(1)}x`;
+  saveState();
+});
+
+/* speak */
+speakBtn.addEventListener("click", () => {
+  stopAuto();
+  const real = currentRealIndex();
+  if(real == null) return;
+  speak(VOCAB[real].en);
+});
+
+/* auto time */
+autoEnMsInput.addEventListener("change", () => {
+  stopAuto();
+  state.autoEnMs = sanitizeMs(autoEnMsInput.value, 200, 10000, 1500);
+  autoEnMsInput.value = String(state.autoEnMs);
+  saveState();
+});
+autoJaMsInput.addEventListener("change", () => {
+  stopAuto();
+  state.autoJaMs = sanitizeMs(autoJaMsInput.value, 200, 20000, 1000);
+  autoJaMsInput.value = String(state.autoJaMs);
+  saveState();
+});
+autoTimeResetBtn.addEventListener("click", () => {
+  stopAuto();
+  state.autoEnMs = 1500;
+  state.autoJaMs = 1000;
+  autoEnMsInput.value = String(state.autoEnMs);
+  autoJaMsInput.value = String(state.autoJaMs);
+  saveState();
+});
+
+/* wheel */
+wheelOpenBtn.addEventListener("click", openWheel);
+wheelCloseBtn.addEventListener("click", closeWheel);
+wheelClearSearchBtn.addEventListener("click", () => { wheelSearchInput.value = ""; rebuildWheelList(); });
+wheelSearchInput.addEventListener("input", rebuildWheelList);
+wheelJumpBtn.addEventListener("click", wheelJumpToSelected);
+
+wheelList.addEventListener("click", (e) => {
+  const li = e.target.closest(".wheelItem");
+  if(!li) return;
+  const idx = parseInt(li.dataset.index || "0", 10);
+  if(!Number.isFinite(idx)) return;
+  wheelScrollToIndex(idx, true);
+});
+
+wheelViewport.addEventListener("scroll", () => {
+  clearTimeout(wheelSnapTimer);
+  wheelSnapTimer = setTimeout(() => {
+    if (wheelOverlay.classList.contains("show")) wheelSnap();
+  }, 140);
+}, { passive:true });
+
+wheelOverlay.addEventListener("click", (e) => { if(e.target === wheelOverlay) closeWheel(); });
+document.addEventListener("keydown", (e) => { if(e.key === "Escape" && wheelOverlay.classList.contains("show")) closeWheel(); });
+
+/* =========================
+   Init
+========================= */
+(function init(){
+  rangeFrom.min = "1";
+  rangeTo.min = "1";
+  rangeFrom.max = String(VOCAB.length);
+  rangeTo.max = String(VOCAB.length);
+
+  loadState();
+
+  /* clamp */
+  state.rangeFrom = clamp(toInt(state.rangeFrom, 1), 1, VOCAB.length);
+  state.rangeTo   = clamp(toInt(state.rangeTo, VOCAB.length), 1, VOCAB.length);
+  if(state.rangeFrom > state.rangeTo) state.rangeFrom = state.rangeTo;
+
+  state.rate = clamp(Number(state.rate) || 1.0, 0.6, 1.4);
+  state.autoEnMs = clamp(Number(state.autoEnMs) || 1500, 200, 10000);
+  state.autoJaMs = clamp(Number(state.autoJaMs) || 1000, 200, 20000);
+
+  document.body.classList.toggle("dark", state.dark);
+
+  /* order */
+  if(!Array.isArray(state.shuffled) || state.shuffled.length === 0){
+    buildOrder();
+  }else{
+    const base = new Set(inRangeIndices());
+    const ok = state.shuffled.every(i => base.has(i));
+    if(!ok) buildOrder();
+    state.idx = clamp(state.idx, 0, Math.max(0, state.shuffled.length - 1));
+  }
+
+  /* safety: reloadでAuto勝手に開始しない */
+  state.autoOn = false;
+  if(autoTimer) clearTimeout(autoTimer);
+  autoTimer = 0;
+  setWakeUI(false, "WakeLock: OFF");
+
+  syncRangeConstraints();
+  render();
+
+  // ★ iOS/iPadOS対策：voicesを取得しに行く（空配列対策）
+  if ("speechSynthesis" in window) {
+    cachedEnglishVoice = pickEnglishVoice();
+    try { speechSynthesis.getVoices(); } catch(e) {}
+  }
+})();
+</script>
+</body>
+</html>
